@@ -1,4 +1,4 @@
-# ManiScouting
+# ScoutingPlanner
 
 Aquest projecte pretén crear una eina per a trobar les millors rutes i combinacions per a veure els millors partits de futbol català.
 

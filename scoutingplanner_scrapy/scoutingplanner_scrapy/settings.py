@@ -1,6 +1,6 @@
 from os.path import join, dirname, abspath
 
-# Scrapy settings for maniscouting_scrapy project
+# Scrapy settings for scoutingplanner_scrapy project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,14 +9,14 @@ from os.path import join, dirname, abspath
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = "maniscouting_scrapy"
+BOT_NAME = "scoutingplanner_scrapy"
 
-SPIDER_MODULES = ["maniscouting_scrapy.spiders"]
-NEWSPIDER_MODULE = "maniscouting_scrapy.spiders"
+SPIDER_MODULES = ["scoutingplanner_scrapy.spiders"]
+NEWSPIDER_MODULE = "scoutingplanner_scrapy.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = "maniscouting_scrapy (+http://www.yourdomain.com)"
+#USER_AGENT = "scoutingplanner_scrapy (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -47,13 +47,13 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    "maniscouting_scrapy.middlewares.ManiscoutingScrapySpiderMiddleware": 543,
+#    "scoutingplanner_scrapy.middlewares.ScoutingplannerScrapySpiderMiddleware": 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    "maniscouting_scrapy.middlewares.ManiscoutingScrapyDownloaderMiddleware": 543,
+#    "scoutingplanner_scrapy.middlewares.ScoutingplannerScrapyDownloaderMiddleware": 543,
 #}
 
 # Enable or disable extensions
@@ -65,7 +65,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    "maniscouting_scrapy.pipelines.MatchesPipeline": 300,
+    "scoutingplanner_scrapy.pipelines.MatchesPipeline": 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -95,5 +95,5 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
 # MongoDB settings
-MONGO_URI = "mongodb+srv://maniscouting.x9gqegj.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority"
+MONGO_URI = "mongodb+srv://scoutingplanner.x9gqegj.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority"
 MONGO_CERTIFICATE_PATH = join(dirname(dirname(dirname(abspath(__file__)))), "etc", "ssl", "X509-cert-2807408085877774822.pem")

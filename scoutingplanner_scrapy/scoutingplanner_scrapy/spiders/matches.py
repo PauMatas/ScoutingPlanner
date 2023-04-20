@@ -1,7 +1,7 @@
 import scrapy
 from scrapy.spiders import Spider
-from maniscouting_scrapy.items import Match
-from maniscouting_scrapy.utils import *
+from scoutingplanner_scrapy.items import Match
+from scoutingplanner_scrapy.utils import *
 
 class MatchesSpider(Spider):
     name = 'matches'
