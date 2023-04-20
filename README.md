@@ -13,7 +13,7 @@ La idea és extreure tant calendaris, com resultats i informació dels equips. E
 S'utilitzarà [`scrapy`](https://docs.scrapy.org/en/latest/) per a scrapejar directament la web de la [Federació Catalana de Futbol](https://www.fcf.cat).
 
 - [ ] Spider classificació
-- [ ] Spider jornades
+- [x] Spider jornades
 
 ### Gestió de rutes
 
@@ -27,9 +27,10 @@ Aquesta part no està planejada ja que dependrà de la implementació de les due
 
 ## Competicions que abarca
 
-- Amateur\*
-- Juvenil DH\*\*
+- Primera RFEF
+- Segona RFEF
+- Tercera RFEF\*
+- Juvenil DH\*
 - Cadet DH
 
-> \* Amateur TODO: definir quines categories  
-> \*\* Juvenil TODO: La categoria és divisió d'honor??
+> \* TODO: Alguna categoria més?
