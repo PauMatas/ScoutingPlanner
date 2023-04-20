@@ -1,2 +1,8 @@
 # environment #
 .env
+
+# private information #
+etc
+
+# python #
+*.pyc
