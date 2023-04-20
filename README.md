@@ -10,7 +10,7 @@ El projecte tindrà tres eixos principals el scraping de la web de la federació
 
 La idea és extreure tant calendaris, com resultats i informació dels equips. En primer lloc els calendaris són un bàsic que ha de servir per a situar els partits en el temps, per a situar-los en l'espai la idea és extreure informació dels estadis dels equips sabent on es juga amb el calendari. Per últim els resultats dels diferents partits serviran juntament amb la classificació per a ponderar quins són els futurs partits més interessants. De cara a futur podria ser interessant també obtenir informació de jugadors en particular per a que puguin aportar en la importància dels partits.
 
-La idea inicial és utilitzar [`scrapy`](https://docs.scrapy.org/en/latest/) per a scrapejar directament la web de la [Federació Catalana de Futbol](https://www.fcf.cat) o, com a alternativa, fer servir la api de [resultados de fútbol](https://www.resultados-futbol.com/api/documentacion).
+S'utilitzarà [`scrapy`](https://docs.scrapy.org/en/latest/) per a scrapejar directament la web de la [Federació Catalana de Futbol](https://www.fcf.cat).
 
 - [ ] Spider classificació
 - [ ] Spider jornades
