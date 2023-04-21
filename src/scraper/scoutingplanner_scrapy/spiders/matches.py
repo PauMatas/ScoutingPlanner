@@ -1,7 +1,7 @@
-import scrapy
 from scrapy.spiders import Spider
-from scoutingplanner_scrapy.items import Match
-from scoutingplanner_scrapy.utils import *
+
+from src.scraper.scoutingplanner_scrapy.items import Match
+from src.scraper.scoutingplanner_scrapy.utils import *
 
 class MatchesSpider(Spider):
     name = 'matches'
@@ -10,6 +10,7 @@ class MatchesSpider(Spider):
                   'https://www.fcf.cat/resultats/2223/futbol-11/tercera-federacio/grup-v',
                   'https://www.fcf.cat/resultats/2223/futbol-11/segona-federacio/grup-3',
                   'https://www.fcf.cat/resultats/2223/futbol-11/primera-federacio/grup-2']
+    items = []
 
     def parse(self, response, **kwargs):
         season = response.xpath('//div[@class="col-md-12 p-0 p-impr d-n_impr"]/p[@class="bigtitle fs-18_ml p-10 m-0 mt-30"]/span[@class="apex"]/text()').get()
@@ -50,4 +51,5 @@ class MatchesSpider(Spider):
             if google_maps_link is not None:
                 match_dict['latlon'] = parse_google_maps_link(google_maps_link)
 
+            self.items.append(match_dict)
             yield Match(**match_dict)

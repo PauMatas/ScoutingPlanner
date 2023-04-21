@@ -9,6 +9,8 @@ from os.path import join, dirname, abspath
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+LOG_LEVEL = "ERROR"
+
 BOT_NAME = "scoutingplanner_scrapy"
 
 SPIDER_MODULES = ["scoutingplanner_scrapy.spiders"]
