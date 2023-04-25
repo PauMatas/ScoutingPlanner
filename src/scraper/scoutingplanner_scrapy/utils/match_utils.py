@@ -11,9 +11,14 @@ def parse_timestamp(date: str, time: str) -> datetime:
     Returns:
         datetime: Datetime object
     """
-    date = date.split('-')
-    time = time.split(':')
-    return datetime(int(date[2]), int(date[1]), int(date[0]), int(time[0]), int(time[1]))
+    try:
+        date = date.split('-')
+        if len(time) != 5:
+            return datetime(int(date[2]), int(date[1]), int(date[0]))
+        time = time.split(':')
+        return datetime(int(date[2]), int(date[1]), int(date[0]), int(time[0]), int(time[1]))
+    except:
+        return None
 
 def parse_google_maps_link(link: str) -> tuple[float, float]:
     """Parse a Google Maps link to get the coordinates.
