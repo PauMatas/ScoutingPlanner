@@ -8,6 +8,8 @@
 from pymongo import MongoClient
 from itemadapter import ItemAdapter
 
+from src.interfaces.database import MongoDBDatabaseProxy
+
 class MatchesPipeline:
 
     def __init__(self, mongo_uri, mongo_db, mongo_certificate_path):
@@ -33,5 +35,5 @@ class MatchesPipeline:
         self.client.close()
 
     def process_item(self, item, spider):
-        self.db[item.season].insert_one(ItemAdapter(item).asdict())
+        MongoDBDatabaseProxy().save_match(item)
         return item

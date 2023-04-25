@@ -6,3 +6,6 @@ etc
 
 # python #
 *.pyc
+
+# macos #
+.DS_Store
