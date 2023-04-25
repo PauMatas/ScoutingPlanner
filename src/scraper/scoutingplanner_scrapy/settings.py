@@ -1,4 +1,5 @@
 from os.path import join, dirname, abspath
+import json
 
 # Scrapy settings for scoutingplanner_scrapy project
 #
@@ -97,5 +98,8 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
 # MongoDB settings
-MONGO_URI = "mongodb+srv://scoutingplanner.x9gqegj.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority"
-MONGO_CERTIFICATE_PATH = join(dirname(dirname(dirname(abspath(__file__)))), "etc", "ssl", "X509-cert-2807408085877774822.pem")
+root_dir = dirname(dirname(dirname(dirname(abspath(__file__)))))
+with open(join(root_dir, "etc/config.json"), "r") as f:
+    config = json.load(f)
+    MONGO_URI = config["mongoDB"]["uri"]
+    MONGO_CERTIFICATE_PATH = join(root_dir, config["mongoDB"]["certificate_path"])

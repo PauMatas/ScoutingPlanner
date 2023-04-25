@@ -1,3 +1,7 @@
+from os.path import join, dirname, abspath
+import sys
+sys.path.append(join(dirname(abspath(__file__)), '../../../../'))
+
 from scrapy.spiders import Spider
 
 from src.scraper.scoutingplanner_scrapy.items import Match
@@ -37,7 +41,9 @@ class MatchesSpider(Spider):
                 date = match.xpath('normalize-space(.//td[@class="p-5 resultats-w-resultat tc"]/a/div[@class="tc fs-9 white bg-grey mb-2 lh-data"]/text())').get()
                 time = match.xpath('normalize-space(.//td[@class="p-5 resultats-w-resultat tc"]/a/div[@class="tc fs-17 white bg-grey"]/text())').get()
                 if date is not None and time is not None:
-                    match_dict['timestamp'] = parse_timestamp(date, time)
+                    parsed_timestamp = parse_timestamp(date, time)
+                    if parsed_timestamp is not None: # Parsing has been successful
+                        match_dict['timestamp'] = parsed_timestamp
 
             # Teams
             match_dict['home_team'] = match.xpath('.//td[@class="p-5 resultats-w-equip tr"]/a/text()').get()
