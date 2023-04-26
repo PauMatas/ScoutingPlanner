@@ -14,35 +14,47 @@ class MongoDBDatabaseProxy(AbstractDatabaseProxy):
     with open(join(_ROOT_DIR, 'etc/config.json')) as f:
         _config = json.load(f)
         _uri = _config['mongoDB']['uri']
-        _certificate_path = join(_ROOT_DIR, _config['mongoDB']['certificate_path'])
+        _certificate_path = join(
+            _ROOT_DIR, _config['mongoDB']['certificate_path'])
 
     def database_connection(func):
         def wrapper(self, *args, **kwargs):
-            self.client = MongoClient(self._uri, tls=True, tlsCertificateKeyFile=self._certificate_path)
+            self.client = MongoClient(
+                self._uri, tls=True, tlsCertificateKeyFile=self._certificate_path)
             result = func(self, *args, **kwargs)
             self.client.close()
             return result
         return wrapper
-    
+
     @database_connection
-    def get_matches(self, season: str, **kwargs) -> list[Match]:
+    def get_matches(self, season: str, as_dict: bool = False, **kwargs) -> list[Match | dict]:
         query = kwargs
         # TODO: Add support for other filters
         if 'timestamp' in kwargs:
-            if isinstance(kwargs['timestamp'], datetime):
-                date = kwargs['timestamp'].replace(hour=0, minute=0, second=0, microsecond=0)
-                query['timestamp'] = {'$gte': date, '$lt': date + timedelta(days=1)}
+            if isinstance(kwargs['timestamp'], dict):
+                if '$gte' in kwargs['timestamp'] and '$lt' in kwargs['timestamp']:
+                    query['timestamp'] = kwargs['timestamp']
+                else:
+                    raise TypeError(
+                        'timestamp must be a dict with $gte and $lt keys')
+            elif isinstance(kwargs['timestamp'], datetime):
+                date = kwargs['timestamp'].replace(
+                    hour=0, minute=0, second=0, microsecond=0)
+                query['timestamp'] = {'$gte': date,
+                                      '$lt': date + timedelta(days=1)}
             else:
-                raise TypeError('timestamp must be of type datetime')
-            
+                raise TypeError('timestamp must be a datetime or a dict')
+
         self.db = self.client.matches
-        return self.db[season].find(query)
+        if as_dict:
+            return [dict for dict in self.db[season].find(query, projection={'_id': False})]
+        return [Match(**dict) for dict in self.db[season].find(query, projection={'_id': False})]
 
     @database_connection
     def save_match(self, match: Match):
         self.db = self.client.matches
         collection = self.db[match.season]
-        
+
         keys_dict = {
             'season': match.season,
             'competition': match.competition,
@@ -53,7 +65,8 @@ class MongoDBDatabaseProxy(AbstractDatabaseProxy):
         }
 
         if collection.find_one(keys_dict):
-            collection.update_one(keys_dict, {'$set': ItemAdapter(match).asdict()})
+            collection.update_one(
+                keys_dict, {'$set': ItemAdapter(match).asdict()})
         else:
             collection.insert_one(ItemAdapter(match).asdict())
 

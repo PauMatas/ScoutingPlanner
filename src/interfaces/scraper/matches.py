@@ -7,6 +7,3 @@ def run_matches_spider():
     process = CrawlerProcess(get_project_settings())
     process.crawl(MatchesSpider)
     process.start()
-
-    # Return the extracted items
-    return MatchesSpider.items
