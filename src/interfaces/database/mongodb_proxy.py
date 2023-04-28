@@ -25,10 +25,20 @@ class MongoDBDatabaseProxy(AbstractDatabaseProxy):
             self.client.close()
             return result
         return wrapper
-
-    @database_connection
-    def get_matches(self, season: str, as_dict: bool = False, **kwargs) -> list[Match | dict]:
+    
+    def _kwargs_to_query(self, kwargs: dict) -> tuple[dict]:
+        """ Converts kwargs to a tuple of query, sort and projection dicts."""
         query = kwargs
+        sort = {}
+        projection = {'_id': False}
+
+        if 'sort' in kwargs:
+            sort = query.pop('sort')
+        if 'projection' in kwargs:
+            projection = query.pop('projection')
+        else:
+            kwargs['projection'] = {'_id': False}
+        
         # TODO: Add support for other filters
         if 'timestamp' in kwargs:
             if isinstance(kwargs['timestamp'], dict):
@@ -44,11 +54,20 @@ class MongoDBDatabaseProxy(AbstractDatabaseProxy):
                                       '$lt': date + timedelta(days=1)}
             else:
                 raise TypeError('timestamp must be a datetime or a dict')
+            
+        return query, sort, projection
+
+    @database_connection
+    def get_matches(self, season: str, as_dict: bool = False, **kwargs) -> list[Match | dict]:
+        query, sort, projection = self._kwargs_to_query(kwargs)
 
         self.db = self.client.matches
+        result = self.db[season].find(query, projection=projection)
+        if sort:
+            result = result.sort(sort)
         if as_dict:
-            return [dict for dict in self.db[season].find(query, projection={'_id': False})]
-        return [Match(**dict) for dict in self.db[season].find(query, projection={'_id': False})]
+            return [dict for dict in result]
+        return [Match(**dict) for dict in result]
 
     @database_connection
     def save_match(self, match: Match):
@@ -89,3 +108,10 @@ class MongoDBDatabaseProxy(AbstractDatabaseProxy):
             self.db.graphs.update_one({'day': day}, {'$set': {'graph': data}})
         else:
             self.db.graphs.insert_one({'day': day, 'graph': data})
+
+    @database_connection
+    def get_competitions(self, season: str, **kwargs) -> list[str]:
+        query, _, _ = self._kwargs_to_query(kwargs)
+
+        self.db = self.client.matches
+        return self.db[season].distinct('competition')

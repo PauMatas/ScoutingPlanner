@@ -21,3 +21,7 @@ class AbstractDatabaseProxy(ABC):
     @abstractmethod
     def save_matchday_graph(self, day: datetime, graph: DiGraph):
         raise NotImplementedError
+    
+    @abstractmethod
+    def get_competitions(self, season: str) -> list[str]:
+        raise NotImplementedError

@@ -10,12 +10,16 @@ ROOT_DIR = join(dirname(abspath(__file__)), '../..')
 sys.path.append(ROOT_DIR)
 
 from .parsers import *
+from src.interfaces.database import MongoDBDatabaseProxy
+from src.graphs import MatchdayGraph
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
+DB_PROXY = MongoDBDatabaseProxy()
+SEASON = 'TEMPORADA 2022-2023'
 
 def send_markdown_message(func: callable):
     """ Sends a message containing the return of func.
@@ -40,6 +44,7 @@ def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = str(' '.join(context.args))
         try:
             context.user_data['date'] = parse_date(message)
+            print(f'Parsed date: {context.user_data["date"]}, type: {type(context.user_data["date"])}')
             return f"""Quina informació futbolística vols saber del dia {context.user_data['date'].date()}? 📅"""
         except ParseError:
             return """❌ Format de data incorrecte. Si us plau, introdueix la data en el format DD-MM-AAAA.
@@ -59,11 +64,24 @@ Si no saps com fer-ho, pots escriure /help i t'ajudo."""
 
 @send_markdown_message
 def competitions(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    raise NotImplementedError
+    print(f'User data: {context.user_data["date"]}, type: {type(context.user_data["date"])}')
+    try:
+        competitions = DB_PROXY.get_competitions(season=SEASON, timestamp=context.user_data['date'])
+    except:
+        competitions = DB_PROXY.get_competitions(season=SEASON)
+    print(competitions)
+    competitions = [f'- **{competition}**' for competition in competitions]
+    print(competitions)
+    competitions = '\n'.join(competitions)
+    print(competitions)
+    return f"""🏆 Aquestes són les competicions disponibles per a la {SEASON}:
+
+{competitions}"""
+
 
 @send_markdown_message
 def matchday(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    raise NotImplementedError
+    matches = DB_PROXY.get_matches(season=SEASON, timestamp=context.user_data['date'], sort={'competition': 1})
 
 @send_markdown_message
 def route(update: Update, context: ContextTypes.DEFAULT_TYPE):
