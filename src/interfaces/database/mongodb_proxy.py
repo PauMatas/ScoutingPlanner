@@ -37,7 +37,7 @@ class MongoDBDatabaseProxy(AbstractDatabaseProxy):
         if 'projection' in kwargs:
             projection = query.pop('projection')
         else:
-            kwargs['projection'] = {'_id': False}
+            projection = {'_id': False}
         
         # TODO: Add support for other filters
         if 'timestamp' in kwargs:

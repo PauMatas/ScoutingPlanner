@@ -11,7 +11,7 @@ sys.path.append(ROOT_DIR)
 
 from .parsers import *
 from src.interfaces.database import MongoDBDatabaseProxy
-from src.graphs import MatchdayGraph
+from src.graphs.matchday_graph import MatchDayGraph
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -26,10 +26,18 @@ def send_markdown_message(func: callable):
     """
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=func(update, context),
-                parse_mode=ParseMode.MARKDOWN)
+            message = func(update, context)
+            if isinstance(message, list):
+                for m in message:
+                    await context.bot.send_message(
+                        chat_id=update.effective_chat.id,
+                        text=m,
+                        parse_mode=ParseMode.MARKDOWN)
+            elif isinstance(message, str):
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=message,
+                    parse_mode=ParseMode.MARKDOWN)
         except NotImplementedError:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
@@ -44,7 +52,6 @@ def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = str(' '.join(context.args))
         try:
             context.user_data['date'] = parse_date(message)
-            print(f'Parsed date: {context.user_data["date"]}, type: {type(context.user_data["date"])}')
             return f"""Quina informació futbolística vols saber del dia {context.user_data['date'].date()}? 📅"""
         except ParseError:
             return """❌ Format de data incorrecte. Si us plau, introdueix la data en el format DD-MM-AAAA.
@@ -64,16 +71,12 @@ Si no saps com fer-ho, pots escriure /help i t'ajudo."""
 
 @send_markdown_message
 def competitions(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(f'User data: {context.user_data["date"]}, type: {type(context.user_data["date"])}')
     try:
         competitions = DB_PROXY.get_competitions(season=SEASON, timestamp=context.user_data['date'])
     except:
         competitions = DB_PROXY.get_competitions(season=SEASON)
-    print(competitions)
     competitions = [f'- **{competition}**' for competition in competitions]
-    print(competitions)
     competitions = '\n'.join(competitions)
-    print(competitions)
     return f"""🏆 Aquestes són les competicions disponibles per a la {SEASON}:
 
 {competitions}"""
@@ -81,11 +84,51 @@ def competitions(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @send_markdown_message
 def matchday(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    matches = DB_PROXY.get_matches(season=SEASON, timestamp=context.user_data['date'], sort={'competition': 1})
+    competitions = DB_PROXY.get_competitions(season=SEASON)
+    messages = []
+    for competition in competitions:
+        matches = DB_PROXY.get_matches(season=SEASON, competition=competition, timestamp=context.user_data['date'])
+        if matches:
+            message = f"""🏆 **{competition}**"""
+            message += "\n\n"
+            for match in matches:
+                if not match.finished:
+                    day = str(match.timestamp.day)
+                    month = str(match.timestamp.month)
+                    hour = str(match.timestamp.hour) if match.timestamp.hour >= 10 else f"0{match.timestamp.hour}"
+                    minute = str(match.timestamp.minute) if match.timestamp.minute >= 10 else f"0{match.timestamp.minute}"
+                    match_markdown = f"""*[{day}/{month} {hour}:{minute}]* {match.home_team} - {match.away_team}"""
+                else:
+                    home_goals = match.home_goals
+                    away_goals = match.away_goals
+                    match_markdown = f"""{match.home_team} *{home_goals} - {away_goals}* {match.away_team}"""
+                message += match_markdown + "\n"
+            messages.append(message)
+        else:
+            print(f"No matches for {competition}")
+    
+    return messages
+
+
 
 @send_markdown_message
-def route(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    raise NotImplementedError
+def routes(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    matchday_graph = MatchDayGraph(context.user_data['date'])
+    routes = matchday_graph.routes()
+    routes_markdown_list = []
+    for i, route in enumerate(routes):
+        route_markdown = f"""📍🗺 _Ruta {i+1}:_"""
+        route_markdown += "\n\n"
+        for match in route:
+            match.home_team = match.home_team
+            match.away_team = match.away_team
+            hour = str(match.timestamp.hour) if match.timestamp.hour >= 10 else f"0{match.timestamp.hour}"
+            minute = str(match.timestamp.minute) if match.timestamp.minute >= 10 else f"0{match.timestamp.minute}"
+            match_markdown = f"""*[{hour}:{minute}]* {match.home_team} - {match.away_team}"""
+            route_markdown += match_markdown + "\n"
+        routes_markdown_list.append(route_markdown)
+
+    return routes_markdown_list
 
 @send_markdown_message
 def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -96,6 +139,6 @@ def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 /help - Mostra aquesta llista de comandes 🆘
 /competitions - Mostra les competicions disponibles 🏆
 /matchday - Mostra els partits d'un dia concret ⚽🆚
-/route - Ajuda a trobar la millor ruta per arribar al partit 📍🗺
+/routes - Ajuda a trobar la millor ruta per arribar al partit 📍🗺
 /feedback - Per enviar comentaris o suggeriments al meu equip de desenvolupament 👨‍💻
 """
