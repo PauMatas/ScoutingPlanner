@@ -1,1 +1,2 @@
+from .base_proxy import AbstractDatabaseProxy
 from .mongodb_proxy import MongoDBDatabaseProxy
