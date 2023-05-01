@@ -8,7 +8,7 @@ import sys
 ROOT_DIR = join(dirname(abspath(__file__)), '../..')
 sys.path.append(ROOT_DIR)
 
-from src.bot.commands import start, competitions, matchday, routes, help
+from src.bot.commands import start, competitions, matches, routes, help
 
 
 
@@ -25,7 +25,7 @@ application = ApplicationBuilder().token(TOKEN).build()
 application.add_handler(CommandHandler('start', start))
 application.add_handler(CommandHandler('help', help))
 application.add_handler(CommandHandler('competitions', competitions))
-application.add_handler(CommandHandler('matchday', matchday))
+application.add_handler(CommandHandler('matches', matches))
 application.add_handler(CommandHandler('routes', routes))
 
 application.run_polling()

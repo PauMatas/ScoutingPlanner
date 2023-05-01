@@ -83,7 +83,7 @@ def competitions(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @send_markdown_message
-def matchday(update: Update, context: ContextTypes.DEFAULT_TYPE):
+def matches(update: Update, context: ContextTypes.DEFAULT_TYPE):
     competitions = DB_PROXY.get_competitions(season=SEASON)
     messages = []
     for competition in competitions:
@@ -138,7 +138,7 @@ def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 /start <dd-mm-aaaa> - Escull quin dia vols fer scouting 📅
 /help - Mostra aquesta llista de comandes 🆘
 /competitions - Mostra les competicions disponibles 🏆
-/matchday - Mostra els partits d'un dia concret ⚽🆚
+/matches - Mostra els partits d'un dia concret ⚽🆚
 /routes - Ajuda a trobar la millor ruta per arribar al partit 📍🗺
 /feedback - Per enviar comentaris o suggeriments al meu equip de desenvolupament 👨‍💻
 """
