@@ -5,13 +5,13 @@ import json
 import time
 import logging
 
-logging.getLogger("requests").setLevel(logging.WARNING)
-
 from .base_proxy import AbstractRouteProxy
+
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 class OpenRouteServiceProxy(AbstractRouteProxy):
 
-    API_KEY_PATH = join(dirname(abspath(__file__)), '../../etc/config.json')
+    API_KEY_PATH = join(dirname(abspath(__file__)), '../../../etc/config.json')
 
     with open(API_KEY_PATH) as json_file:
         config = json.load(json_file)
@@ -23,7 +23,7 @@ class OpenRouteServiceProxy(AbstractRouteProxy):
             self.lat = lat
             self.lon = lon
 
-    def route_route_temporal_distance(self, origin: tuple[float, float], destination: tuple[float, float], departure_time: datetime | None = None) -> float:
+    def route_temporal_distance(self, origin: tuple[float, float], destination: tuple[float, float], departure_time: datetime | None = None) -> float:
         """ Returns the time in minutes between the origin and the destination """
         origin = self.Location(*origin)
         destination = self.Location(*destination)

@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from src.interfaces.scraper import run_matches_spider
-from src.interfaces.database import MongoDBDatabaseProxy
-from src.interfaces.routes import OpenRouteServiceProxy
-from src.scraper.scoutingplanner_scrapy.items import Match
+from interfaces.scraper import run_matches_spider
+from interfaces.database import MongoDBDatabaseProxy
+from interfaces.routes import OpenRouteServiceProxy
+from scraper.scoutingplanner_scrapy.items import Match
 
 from .planner import Planner
 from .utils import parse_matchday_date
@@ -24,7 +24,7 @@ class Matchday:
         ))
         self.reachable_matches = sorted(self.reachable_matches, key=lambda m: m.timestamp)
 
-        self.planner = Planner(db_proxy=self.db_proxy, routes_proxy=self.routes_proxy, matches=self.reachable_matches, date=self.date)
+        self.planner = Planner(db_proxy=self.db_proxy, routes_proxy=self.routes_proxy, matches=self.reachable_matches, date=self.date, season=self.season)
 
     def routes(self, **kwargs) -> list[list[Match]]:
         return self.planner.routes(**kwargs)

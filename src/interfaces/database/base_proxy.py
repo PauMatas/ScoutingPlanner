@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from networkx import DiGraph
 
-from src.scraper.scoutingplanner_scrapy.items import Match
+from scraper.scoutingplanner_scrapy.items import Match
 
 
 class AbstractDatabaseProxy(ABC):

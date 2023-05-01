@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from networkx import DiGraph, ancestors, descendants
 
-from src.interfaces.database import AbstractDatabaseProxy
-from src.interfaces.routes import AbstractRouteProxy
-from src.scraper.scoutingplanner_scrapy.items import Match
+from interfaces.database import AbstractDatabaseProxy
+from interfaces.routes import AbstractRouteProxy
+from scraper.scoutingplanner_scrapy.items import Match
 
 
 class Planner:
@@ -14,11 +14,12 @@ class Planner:
     DESTINATION_TOKEN = '<end>'
     MATCH_ESTIMATED_DURATION = timedelta(hours=2)
 
-    def __init__(self, db_proxy: AbstractDatabaseProxy, routes_proxy: AbstractRouteProxy, matches: list[Match], date: datetime):
+    def __init__(self, db_proxy: AbstractDatabaseProxy, routes_proxy: AbstractRouteProxy, matches: list[Match], date: datetime, season: str):
         self.db_proxy = db_proxy
         self.routes_proxy = routes_proxy
         self.matches = matches
         self.date = date
+        self.season = season
 
         self.set_graph() # sets self.graph
 

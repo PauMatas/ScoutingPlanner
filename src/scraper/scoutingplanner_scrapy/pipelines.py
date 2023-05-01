@@ -6,9 +6,8 @@
 
 # useful for handling different item types with a single interface
 from pymongo import MongoClient
-from itemadapter import ItemAdapter
 
-from src.interfaces.database import MongoDBDatabaseProxy
+from interfaces.database import MongoDBDatabaseProxy
 
 class MatchesPipeline:
 

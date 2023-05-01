@@ -5,8 +5,9 @@ from networkx import DiGraph, readwrite
 from itemadapter import ItemAdapter
 import json
 
+from scraper.scoutingplanner_scrapy.items import Match
+
 from .base_proxy import AbstractDatabaseProxy
-from src.scraper.scoutingplanner_scrapy.items import Match
 
 
 class MongoDBDatabaseProxy(AbstractDatabaseProxy):

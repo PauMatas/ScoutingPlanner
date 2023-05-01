@@ -1,11 +1,27 @@
-# environment #
+# Environment #
 .env
 
-# private information #
+# Private information #
 etc
 
-# python #
+# macOS files #
+.DS_Store
+
+# Python bytecode files #
+__pycache__/
 *.pyc
 
-# macos #
-.DS_Store
+# Distribution files #
+dist/
+build/
+*.egg-info/
+
+# IDE files #
+.vscode/
+.idea/
+
+# Miscellaneous files #
+*.log
+*.swp
+*.swo
+*.bak

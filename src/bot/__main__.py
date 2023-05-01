@@ -1,16 +1,12 @@
 import logging
 from telegram.ext import ApplicationBuilder, CommandHandler
-
-import json
 from os.path import join, dirname, abspath
-import sys
+import json
+
+from bot.commands import start, competitions, matches, routes, help
+
 
 ROOT_DIR = join(dirname(abspath(__file__)), '../..')
-sys.path.append(ROOT_DIR)
-
-from src.bot.commands import start, competitions, matches, routes, help
-
-
 
 with open(join(ROOT_DIR, 'etc/config.json'), 'r') as f:
     config = json.load(f)

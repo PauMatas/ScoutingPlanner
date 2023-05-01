@@ -1,11 +1,7 @@
-from os.path import join, dirname, abspath
-import sys
-sys.path.append(join(dirname(abspath(__file__)), '../../../../'))
-
 from scrapy.spiders import Spider
 
-from src.scraper.scoutingplanner_scrapy.items import Match
-from src.scraper.scoutingplanner_scrapy.utils import *
+from scraper.scoutingplanner_scrapy.items import Match
+from scraper.scoutingplanner_scrapy.utils import *
 
 class MatchesSpider(Spider):
     name = 'matches'
