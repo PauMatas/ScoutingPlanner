@@ -27,4 +27,4 @@ class Matchday:
         self.planner = Planner(db_proxy=self.db_proxy, routes_proxy=self.routes_proxy, matches=self.reachable_matches, date=self.date)
 
     def routes(self, **kwargs) -> list[list[Match]]:
-        pass
+        return self.planner.routes(**kwargs)

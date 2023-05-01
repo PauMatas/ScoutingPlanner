@@ -3,15 +3,10 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from os.path import join, dirname, abspath
-import sys
-
-ROOT_DIR = join(dirname(abspath(__file__)), '../..')
-sys.path.append(ROOT_DIR)
+from interfaces.database import MongoDBDatabaseProxy
+from matchday import Matchday
 
 from .parsers import *
-from src.interfaces.database import MongoDBDatabaseProxy
-from src.graphs.matchday_graph import MatchDayGraph
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -113,7 +108,7 @@ def matches(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @send_markdown_message
 def routes(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    matchday_graph = MatchDayGraph(context.user_data['date'])
+    matchday_graph = Matchday(context.user_data['date'])
     routes = matchday_graph.routes()
     routes_markdown_list = []
     for i, route in enumerate(routes):
