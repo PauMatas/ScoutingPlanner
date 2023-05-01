@@ -78,27 +78,24 @@ def competitions(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @send_markdown_message
 def matches(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    competitions = DB_PROXY.get_competitions(season=SEASON)
+    matches = context.user_data['matchday'].matches
+    competitions = context.user_data['matchday'].competitions.keys()
     for competition in competitions:
-        matches = DB_PROXY.get_matches(season=SEASON, competition=competition, timestamp=context.user_data['date'])
-        if matches:
-            message = f"""🏆 **{competition}**"""
-            message += "\n\n"
-            for match in matches:
-                if not match.finished:
-                    day = str(match.timestamp.day)
-                    month = str(match.timestamp.month)
-                    hour = str(match.timestamp.hour) if match.timestamp.hour >= 10 else f"0{match.timestamp.hour}"
-                    minute = str(match.timestamp.minute) if match.timestamp.minute >= 10 else f"0{match.timestamp.minute}"
-                    match_markdown = f"""*[{day}/{month} {hour}:{minute}]* {match.home_team} - {match.away_team}"""
-                else:
-                    home_goals = match.home_goals
-                    away_goals = match.away_goals
-                    match_markdown = f"""{match.home_team} *{home_goals} - {away_goals}* {match.away_team}"""
-                message += match_markdown + "\n"
-            yield message
-        else:
-            print(f"No matches for {competition}")
+        message = f"""🏆 **{competition}**"""
+        message += "\n\n"
+        for match in filter(lambda m: m.competition == competition, matches):
+            if not match.finished:
+                day = str(match.timestamp.day)
+                month = str(match.timestamp.month)
+                hour = str(match.timestamp.hour) if match.timestamp.hour >= 10 else f"0{match.timestamp.hour}"
+                minute = str(match.timestamp.minute) if match.timestamp.minute >= 10 else f"0{match.timestamp.minute}"
+                match_markdown = f"""*[{day}/{month} {hour}:{minute}]* {match.home_team} - {match.away_team}"""
+            else:
+                home_goals = match.home_goals
+                away_goals = match.away_goals
+                match_markdown = f"""{match.home_team} *{home_goals} - {away_goals}* {match.away_team}"""
+            message += match_markdown + "\n"
+        yield message
 
 @send_markdown_message
 def routes(update: Update, context: ContextTypes.DEFAULT_TYPE):
