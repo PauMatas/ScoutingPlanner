@@ -23,18 +23,14 @@ class OpenRouteServiceProxy(AbstractRouteProxy):
             self.lat = lat
             self.lon = lon
 
-    def __init__(self, origin: tuple[float, float], destination: tuple[float, float], departure_time: datetime | None = None):
-        """ 
-        Creates a proxy to the OpenRouteService API.
-        """
-        self.origin = self.Location(*origin)
-        self.destination = self.Location(*destination)
-        self.departure_time = departure_time.strftime('%Y-%m-%dT%H:%M:%S')
-
-    def temporal_distance(self) -> float:
+    def route_route_temporal_distance(self, origin: tuple[float, float], destination: tuple[float, float], departure_time: datetime | None = None) -> float:
         """ Returns the time in minutes between the origin and the destination """
+        origin = self.Location(*origin)
+        destination = self.Location(*destination)
+        departure_time = departure_time.strftime('%Y-%m-%dT%H:%M:%S')
+
         # API request
-        url = f'https://api.openrouteservice.org/v2/directions/driving-car?api_key={self.API_KEY}&start={self.origin.lon},{self.origin.lat}&end={self.destination.lon},{self.destination.lat}&departure_time={self.departure_time}&options=timezone:Europe/Madrid'
+        url = f'https://api.openrouteservice.org/v2/directions/driving-car?api_key={self.API_KEY}&start={origin.lon},{origin.lat}&end={destination.lon},{destination.lat}&departure_time={departure_time}&options=timezone:Europe/Madrid'
         
         response = requests.get(url)
         while response.status_code == 429:
