@@ -85,8 +85,11 @@ class MongoDBDatabaseProxy(AbstractDatabaseProxy):
         }
 
         if collection.find_one(keys_dict):
+            aux = ItemAdapter(match).asdict()
+            match_dict = {k: v for k, v in aux.items() if v is not None}
+            print(match_dict)
             collection.update_one(
-                keys_dict, {'$set': ItemAdapter(match).asdict()})
+                keys_dict, {'$set': match_dict})
         else:
             collection.insert_one(ItemAdapter(match).asdict())
 
