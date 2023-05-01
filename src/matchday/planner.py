@@ -34,7 +34,7 @@ class Planner:
             self.add_nodes()
             self.add_edges()
 
-            self.db_proxy.save_matchday_graph(self.graph, self.date)
+            self.db_proxy.save_matchday_graph(self.date, self.graph)
 
     def node_weight(self, match: Match) -> float:
         """Returns the weight of a node."""

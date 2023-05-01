@@ -9,7 +9,7 @@ def parse_matchday_date(date: datetime | str | None, **kwargs) -> datetime:
         return datetime.strptime(date, kwargs.get('format', '%d-%m-%Y'))
     
     if date is None:
-        if ['day', 'month', 'year'] in kwargs:
+        if all(k in kwargs for k in ['day', 'month', 'year']):
             return datetime(kwargs['year'], kwargs['month'], kwargs['day'])
         
         now = datetime.now()

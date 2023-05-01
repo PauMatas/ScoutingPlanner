@@ -22,16 +22,10 @@ def send_markdown_message(func: callable):
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             message = func(update, context)
-            if isinstance(message, list):
-                for m in message:
-                    await context.bot.send_message(
-                        chat_id=update.effective_chat.id,
-                        text=m,
-                        parse_mode=ParseMode.MARKDOWN)
-            elif isinstance(message, str):
+            for m in message:
                 await context.bot.send_message(
                     chat_id=update.effective_chat.id,
-                    text=message,
+                    text=m,
                     parse_mode=ParseMode.MARKDOWN)
         except NotImplementedError:
             await context.bot.send_message(
@@ -47,15 +41,20 @@ def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = str(' '.join(context.args))
         try:
             context.user_data['date'] = parse_date(message)
-            return f"""Quina informació futbolística vols saber del dia {context.user_data['date'].date()}? 📅"""
+            yield f"""Espera mentres busco els partits de futbol del dia {context.user_data['date'].date()}... ⏳"""
+            context.user_data['matchday'] = Matchday(date=context.user_data['date'])
+            if not context.user_data['matchday'].matches:
+                yield f"""❌ No he trobat cap partit de futbol per al dia {context.user_data['date'].date()}."""
+            else:
+                yield f"""🔎 Ja tinc tota la informació que necessito, que vols saber?"""
         except ParseError:
-            return """❌ Format de data incorrecte. Si us plau, introdueix la data en el format DD-MM-AAAA.
+            yield """❌ Format de data incorrecte. Si us plau, introdueix la data en el format DD-MM-AAAA.
             
 Exemple: /start 07-12-2001"""
 
     else:
         user = update.effective_chat.first_name
-        return f"""👋 Hola {user}!
+        yield f"""👋 Hola {user}!
 
 Sóc **ScoutingPlanner**, el bot de rutes d'scouting de futbol de Catalunya. 🤖👨‍💻
 Estic aquí per ajudar-te a trobar les millors rutes per als partits de futbol que es celebren a la regió! 📍⚽
@@ -66,21 +65,20 @@ Si no saps com fer-ho, pots escriure /help i t'ajudo."""
 
 @send_markdown_message
 def competitions(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        competitions = DB_PROXY.get_competitions(season=SEASON, timestamp=context.user_data['date'])
-    except:
-        competitions = DB_PROXY.get_competitions(season=SEASON)
-    competitions = [f'- **{competition}**' for competition in competitions]
-    competitions = '\n'.join(competitions)
-    return f"""🏆 Aquestes són les competicions disponibles per a la {SEASON}:
+    competitions_msg = f"""🏆 *Competicions* disponibles per al dia {context.user_data['date'].date()}:"""
+    competitions_msg += "\n\n"
+    for competition, v in context.user_data['matchday'].competitions.items():
+        n_matches = v['matches']
+        matchdays = list(v['matchday'])
 
-{competitions}"""
-
+        competitions_msg += f""" - {n_matches} partit{'' if n_matches == 1 else 's'} de _{competition}_ corresponent{'' if n_matches == 1 else 's'} a l{'a' if len(matchdays) == 1 else 'es'} jornada{'' if len(matchdays) == 1 else 's'} {', '.join(matchdays)}"""
+        competitions_msg += "\n"
+    
+    yield competitions_msg
 
 @send_markdown_message
 def matches(update: Update, context: ContextTypes.DEFAULT_TYPE):
     competitions = DB_PROXY.get_competitions(season=SEASON)
-    messages = []
     for competition in competitions:
         matches = DB_PROXY.get_matches(season=SEASON, competition=competition, timestamp=context.user_data['date'])
         if matches:
@@ -98,19 +96,13 @@ def matches(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     away_goals = match.away_goals
                     match_markdown = f"""{match.home_team} *{home_goals} - {away_goals}* {match.away_team}"""
                 message += match_markdown + "\n"
-            messages.append(message)
+            yield message
         else:
             print(f"No matches for {competition}")
-    
-    return messages
-
-
 
 @send_markdown_message
 def routes(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    matchday_graph = Matchday(context.user_data['date'])
-    routes = matchday_graph.routes()
-    routes_markdown_list = []
+    routes = context.user_data['matchday'].routes()
     for i, route in enumerate(routes):
         route_markdown = f"""📍🗺 _Ruta {i+1}:_"""
         route_markdown += "\n\n"
@@ -121,13 +113,11 @@ def routes(update: Update, context: ContextTypes.DEFAULT_TYPE):
             minute = str(match.timestamp.minute) if match.timestamp.minute >= 10 else f"0{match.timestamp.minute}"
             match_markdown = f"""*[{hour}:{minute}]* {match.home_team} - {match.away_team}"""
             route_markdown += match_markdown + "\n"
-        routes_markdown_list.append(route_markdown)
-
-    return routes_markdown_list
+        yield route_markdown
 
 @send_markdown_message
 def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    return """
+    yield """
 🤖🆘 Aquí tens les comandes que accepto:
 /start - Inicia la conversa amb el bot 👋
 /start <dd-mm-aaaa> - Escull quin dia vols fer scouting 📅

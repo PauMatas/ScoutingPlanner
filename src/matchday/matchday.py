@@ -18,7 +18,7 @@ class Matchday:
         self.date = parse_matchday_date(date, **kwargs)
 
         run_matches_spider()
-        self.matches = self.db_proxy.get_matches(season=self.season, date=self.date)
+        self.matches = self.db_proxy.get_matches(season=self.season, timestamp=self.date)
         self.reachable_matches = list(filter(
             lambda m: m.latlon is not None and m.timestamp is not None, self.matches
         ))
@@ -26,5 +26,25 @@ class Matchday:
 
         self.planner = Planner(db_proxy=self.db_proxy, routes_proxy=self.routes_proxy, matches=self.reachable_matches, date=self.date, season=self.season)
 
+        self._competitions = None
+
     def routes(self, **kwargs) -> list[list[Match]]:
         return self.planner.routes(**kwargs)
+    
+    @property
+    def competitions(self) -> dict:
+        if self._competitions is None:
+            self._set_competitions()
+        return self._competitions
+    
+    def _set_competitions(self):
+        self._competitions = {}
+        for match in self.matches:
+            if match.competition not in self._competitions:
+                self._competitions[match.competition] = {
+                    'matches': 1,
+                    'matchday': {str(match.matchday)}
+                    }
+            else:
+                self._competitions[match.competition]['matches'] += 1
+                self._competitions[match.competition]['matchday'].add(str(match.matchday))
